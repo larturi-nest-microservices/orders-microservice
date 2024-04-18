@@ -18,3 +18,9 @@ npx prisma migrate dev
 
 pnpm run start:dev
 ```
+
+## Levantar la base en ambiente dev con Docker
+
+```bash
+docker-compose up -d
+```
