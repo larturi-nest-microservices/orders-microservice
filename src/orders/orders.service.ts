@@ -31,7 +31,7 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
 
   async create(createOrderDto: CreateOrderDto) {
     const products = await firstValueFrom(
-      this.productsClient.send({ cmd: 'validate_products' }, [6, 7]),
+      this.productsClient.send({ cmd: 'validate_products' }, [6, 7, 9]),
     );
 
     return products;
