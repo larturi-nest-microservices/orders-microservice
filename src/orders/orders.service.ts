@@ -30,11 +30,69 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
   }
 
   async create(createOrderDto: CreateOrderDto) {
-    const products = await firstValueFrom(
-      this.productsClient.send({ cmd: 'validate_products' }, [6, 7, 9]),
-    );
+    try {
+      // Validar que los ids de los productos existen en la base de productos
+      const productsIds = createOrderDto.items.map((item) => item.productId);
+      const products: any[] = await firstValueFrom(
+        this.productsClient.send({ cmd: 'validate_products' }, productsIds),
+      );
 
-    return products;
+      // Calculo de montos
+      const totalAmount = createOrderDto.items.reduce((acc, orderItem) => {
+        const price = products.find(
+          (product) => product.id === orderItem.productId,
+        ).price;
+
+        return acc + price * orderItem.quantity;
+      }, 0);
+
+      const totalItems = createOrderDto.items.reduce((acc, orderItem) => {
+        return acc + orderItem.quantity;
+      }, 0);
+
+      // Transaccion en base de datos
+      const order = await this.order.create({
+        data: {
+          totalAmount,
+          totalItems,
+          OrderItem: {
+            createMany: {
+              data: createOrderDto.items.map((orderItem) => ({
+                price: products.find(
+                  (product) => product.id === orderItem.productId,
+                ).price,
+                productId: orderItem.productId,
+                quantity: orderItem.quantity,
+              })),
+            },
+          },
+        },
+        include: {
+          OrderItem: {
+            select: {
+              price: true,
+              quantity: true,
+              productId: true,
+            },
+          },
+        },
+      });
+
+      return {
+        ...order,
+        OrderItem: order.OrderItem.map((orderItem) => ({
+          ...orderItem,
+          name: products.find((product) => product.id === orderItem.productId)
+            .name,
+        })),
+      };
+    } catch (error) {
+      console.log(error);
+      throw new RpcException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Error on creatting the new order',
+      });
+    }
   }
 
   async findAll(orderPaginationDto: OrderPaginationDto) {
