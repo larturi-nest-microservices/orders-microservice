@@ -25,3 +25,5 @@ docker-compose up -d
 ```bash
 npx prisma migrate dev
 ```
+
+Si eliminas la carpeta node modules, recordar correr `npx prisma generate`
