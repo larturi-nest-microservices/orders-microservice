@@ -9,7 +9,9 @@ async function bootstrap() {
 
   const app = await NestFactory.createMicroservice(AppModule, {
     transport: Transport.NATS,
-    servers: envs.natsServers,
+    options: {
+      servers: envs.natsServers,
+    },
   });
 
   app.useGlobalPipes(
