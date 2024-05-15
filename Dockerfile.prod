@@ -11,6 +11,9 @@ RUN npm install
 # Builder
 FROM node:21-alpine3.19 as build
 
+ARG ORDERS_DB_CONNECT_URL
+ENV DATABASE_URL=$ORDERS_DB_CONNECT_URL
+
 WORKDIR /usr/src/app
 
 # Copy the dependencies
@@ -19,6 +22,7 @@ COPY --from=deps /usr/src/app/node_modules ./node_modules
 # Copy the soure code
 COPY . .
 
+RUN npx prisma migrate deploy
 RUN npx prisma generate
 
 RUN npm run build
