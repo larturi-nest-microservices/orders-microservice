@@ -16,6 +16,6 @@ steps:
       ]
 
 secrets:
-- kmsKeyName: projects/488719957547/secrets/orders_database_url/versions/1
-  secretEnv:
-    DATABASE_URL: "orders_database_url"
+  - kmsKeyName: projects/488719957547/secrets/orders_database_url/versions/1
+    secretEnv:
+      DATABASE_URL: "orders_database_url"
