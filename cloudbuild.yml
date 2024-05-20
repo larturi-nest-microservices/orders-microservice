@@ -4,7 +4,8 @@ steps:
   args:
     - -c
     - |
-      docker build -t southamerica-west1-docker.pkg.dev/cogent-calling-423723-h9/image-registry/orders-ms -f dockerfile.prod --platform=linux/amd64 --build-arg ORDERS_DATABASE_URL=$$DATABASE_URL .
+        echo "DATABASE_URL from secret manager: $DATABASE_URL"
+        docker build -t southamerica-west1-docker.pkg.dev/cogent-calling-423723-h9/image-registry/orders-ms -f dockerfile.prod --platform=linux/amd64 --build-arg ORDERS_DB_CONNECT_URL=$DATABASE_URL .
   secretEnv: ['DATABASE_URL']
 
 - name: 'gcr.io/cloud-builders/docker'
